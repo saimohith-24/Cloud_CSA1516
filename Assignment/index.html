@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud-Based Hostel Complaint Management System (SaaS Demo)</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Top Global Header / SaaS Banner -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-cloud-bolt"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>HostelFix Cloud SaaS</h1>
+                    <span class="sub-title">Hostel Complaint Management Cloud Platform</span>
+                </div>
+            </div>
+
+            <!-- Role Selector & Cloud Status Bar -->
+            <div class="header-controls">
+                <div class="cloud-status-badge tooltip" data-tooltip="Real-time synchronized with Cloud Database">
+                    <span class="pulse-dot"></span>
+                    <span id="cloud-status-text"><i class="fa-solid fa-cloud"></i> Cloud DB Connected</span>
+                </div>
+
+                <div class="role-switcher-container">
+                    <span class="role-label"><i class="fa-solid fa-user-shield"></i> Active Role:</span>
+                    <div class="role-toggle-group">
+                        <button id="role-student-btn" class="role-btn active" onclick="switchRole('student')">
+                            <i class="fa-solid fa-user-graduate"></i> Student
+                        </button>
+                        <button id="role-warden-btn" class="role-btn" onclick="switchRole('warden')">
+                            <i class="fa-solid fa-user-tie"></i> Warden / Admin
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Role Indicator Info Bar -->
+    <div id="role-info-bar" class="role-info-bar student-mode">
+        <div class="info-bar-content">
+            <span id="role-banner-text">
+                <i class="fa-solid fa-info-circle"></i> <strong>Student Mode Active:</strong> You can submit new hostel complaints and view status of submitted complaints.
+            </span>
+            <button class="demo-data-btn" onclick="resetToSampleData()">
+                <i class="fa-solid fa-arrows-rotate"></i> Reset Viva Sample Data
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <button class="nav-tab active" data-target="module-student" onclick="switchTab('module-student')">
+                <i class="fa-solid fa-file-circle-plus"></i> <span>1. Student Complaint</span>
+            </button>
+            <button class="nav-tab" data-target="module-management" onclick="switchTab('module-management')">
+                <i class="fa-solid fa-list-check"></i> <span>2. Complaint Management</span>
+            </button>
+            <button class="nav-tab" data-target="module-dashboard" onclick="switchTab('module-dashboard')">
+                <i class="fa-solid fa-chart-pie"></i> <span>3. Dashboard & Analytics</span>
+            </button>
+            <button class="nav-tab" data-target="module-cloud" onclick="switchTab('module-cloud')">
+                <i class="fa-solid fa-server"></i> <span>4. SaaS & Cloud Concepts</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="main-content">
+
+        <!-- ================= MODULE 1: STUDENT COMPLAINT MODULE ================= -->
+        <section id="module-student" class="module-section active">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-pen-to-square"></i> Student Complaint Module</h2>
+                <p>Register hostel maintenance issues directly into the Cloud SaaS backend system.</p>
+            </div>
+
+            <div class="grid-2col">
+                <!-- Complaint Submission Form Card -->
+                <div class="card form-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-plus-circle"></i> New Complaint Form</h3>
+                        <span class="badge badge-primary">SaaS Cloud Form</span>
+                    </div>
+                    <form id="complaint-form" onsubmit="handleFormSubmit(event)">
+                        <!-- Field 1: Student Name / ID -->
+                        <div class="form-group">
+                            <label for="studentName"><i class="fa-solid fa-user"></i> Student Name / ID <span class="required">*</span></label>
+                            <input type="text" id="studentName" placeholder="e.g. Rahul Sharma (STU-2024-089)" required>
+                        </div>
+
+                        <!-- Field 2: Hostel / Room Number -->
+                        <div class="form-group">
+                            <label for="roomNumber"><i class="fa-solid fa-door-closed"></i> Hostel / Room Number <span class="required">*</span></label>
+                            <input type="text" id="roomNumber" placeholder="e.g. Hostel Block B - Room 304" required>
+                        </div>
+
+                        <div class="form-row">
+                            <!-- Field 3: Complaint Type -->
+                            <div class="form-group col-half">
+                                <label for="complaintType"><i class="fa-solid fa-wrench"></i> Complaint Type <span class="required">*</span></label>
+                                <select id="complaintType" required>
+                                    <option value="" disabled selected>Select Category</option>
+                                    <option value="Electrical">Electrical</option>
+                                    <option value="Plumbing">Plumbing</option>
+                                    <option value="Room Maintenance">Room Maintenance</option>
+                                    <option value="Cleanliness">Cleanliness</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <!-- Field 6: Priority -->
+                            <div class="form-group col-half">
+                                <label for="priority"><i class="fa-solid fa-triangle-exclamation"></i> Priority <span class="required">*</span></label>
+                                <select id="priority" required>
+                                    <option value="Low">Low</option>
+                                    <option value="Medium" selected>Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Critical">Critical</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <!-- Field 5: Date -->
+                            <div class="form-group col-half">
+                                <label for="complaintDate"><i class="fa-regular fa-calendar"></i> Date <span class="required">*</span></label>
+                                <input type="date" id="complaintDate" required>
+                            </div>
+
+                            <!-- Field 7: Status (Default: Submitted for Student) -->
+                            <div class="form-group col-half">
+                                <label for="initialStatus"><i class="fa-solid fa-signal"></i> Initial Status</label>
+                                <input type="text" id="initialStatus" value="Submitted" readonly class="input-readonly">
+                            </div>
+                        </div>
+
+                        <!-- Field 4: Complaint Description -->
+                        <div class="form-group">
+                            <label for="description"><i class="fa-solid fa-align-left"></i> Complaint Description <span class="required">*</span></label>
+                            <textarea id="description" rows="4" placeholder="Describe the issue clearly (e.g., Ceiling fan is vibrating and making loud noise since yesterday evening...)" required></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fa-solid fa-paper-plane"></i> Submit Complaint to Cloud DB
+                            </button>
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="fa-solid fa-rotate-left"></i> Reset Form
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Personal / Submitted Complaints Quick View -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-clock-rotate-left"></i> Submitted Complaints Overview</h3>
+                        <span class="badge badge-info" id="student-count-badge">0 Complaints</span>
+                    </div>
+
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="student-search" placeholder="Search by student name, room or keyword..." oninput="renderStudentComplaints()">
+                    </div>
+
+                    <div id="student-complaints-list" class="complaints-list-container">
+                        <!-- Dynamic Student Complaints Cards -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= MODULE 2: COMPLAINT MANAGEMENT MODULE (WARDEN / ADMIN) ================= -->
+        <section id="module-management" class="module-section">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-list-check"></i> Complaint Management Module</h2>
+                <p>Warden & Admin cloud portal to inspect, search, filter, and resolve hostel grievances.</p>
+            </div>
+
+            <!-- Filter Controls Bar -->
+            <div class="card filter-card">
+                <div class="filter-grid">
+                    <!-- Search Input -->
+                    <div class="filter-group">
+                        <label for="filter-search"><i class="fa-solid fa-magnifying-glass"></i> Search</label>
+                        <input type="text" id="filter-search" placeholder="Search student, room, description..." oninput="renderManagementTable()">
+                    </div>
+
+                    <!-- Filter 1: Complaint Type -->
+                    <div class="filter-group">
+                        <label for="filter-type"><i class="fa-solid fa-filter"></i> Complaint Type</label>
+                        <select id="filter-type" onchange="renderManagementTable()">
+                            <option value="ALL">All Types</option>
+                            <option value="Electrical">Electrical</option>
+                            <option value="Plumbing">Plumbing</option>
+                            <option value="Room Maintenance">Room Maintenance</option>
+                            <option value="Cleanliness">Cleanliness</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter 2: Priority -->
+                    <div class="filter-group">
+                        <label for="filter-priority"><i class="fa-solid fa-layer-group"></i> Priority</label>
+                        <select id="filter-priority" onchange="renderManagementTable()">
+                            <option value="ALL">All Priorities</option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                            <option value="Critical">Critical</option>
+                        </select>
+                    </div>
+
+                    <!-- Filter 3: Status -->
+                    <div class="filter-group">
+                        <label for="filter-status"><i class="fa-solid fa-list-dots"></i> Status</label>
+                        <select id="filter-status" onchange="renderManagementTable()">
+                            <option value="ALL">All Statuses</option>
+                            <option value="Submitted">Submitted</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Resolved">Resolved</option>
+                            <option value="Closed">Closed</option>
+                        </select>
+                    </div>
+
+                    <!-- Reset Filters Button -->
+                    <div class="filter-group align-end">
+                        <button class="btn btn-outline" onclick="resetFilters()">
+                            <i class="fa-solid fa-arrow-rotate-left"></i> Clear Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Management Data Table Card -->
+            <div class="card table-card">
+                <div class="table-header-row">
+                    <h3><i class="fa-solid fa-table"></i> All Recorded Complaints (<span id="management-count">0</span>)</h3>
+                    <div class="table-actions">
+                        <span class="warden-only-notice"><i class="fa-solid fa-lock"></i> Status updating enabled in Warden Mode</span>
+                        <button class="btn btn-sm btn-secondary" onclick="exportDataToJSON()">
+                            <i class="fa-solid fa-download"></i> Export JSON
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Ticket ID</th>
+                                <th>Date</th>
+                                <th>Student Name / ID</th>
+                                <th>Hostel / Room</th>
+                                <th>Type</th>
+                                <th>Priority</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Action / Update Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="management-table-body">
+                            <!-- Dynamic Table Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= MODULE 3: DASHBOARD / REPORT MODULE ================= -->
+        <section id="module-dashboard" class="module-section">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-chart-line"></i> Dashboard & Analytics Report Module</h2>
+                <p>Real-time visual metrics and statistics generated from stored cloud complaint records.</p>
+            </div>
+
+            <!-- Metric Cards Row -->
+            <div class="metrics-grid">
+                <div class="metric-card total">
+                    <div class="metric-icon"><i class="fa-solid fa-folder-open"></i></div>
+                    <div class="metric-data">
+                        <span class="metric-value" id="stat-total">0</span>
+                        <span class="metric-label">Total Complaints</span>
+                    </div>
+                </div>
+
+                <div class="metric-card submitted">
+                    <div class="metric-icon"><i class="fa-solid fa-paper-plane"></i></div>
+                    <div class="metric-data">
+                        <span class="metric-value" id="stat-submitted">0</span>
+                        <span class="metric-label">Submitted</span>
+                    </div>
+                </div>
+
+                <div class="metric-card progress">
+                    <div class="metric-icon"><i class="fa-solid fa-spinner"></i></div>
+                    <div class="metric-data">
+                        <span class="metric-value" id="stat-progress">0</span>
+                        <span class="metric-label">In Progress</span>
+                    </div>
+                </div>
+
+                <div class="metric-card resolved">
+                    <div class="metric-icon"><i class="fa-solid fa-circle-check"></i></div>
+                    <div class="metric-data">
+                        <span class="metric-value" id="stat-resolved">0</span>
+                        <span class="metric-label">Resolved</span>
+                    </div>
+                </div>
+
+                <div class="metric-card closed">
+                    <div class="metric-icon"><i class="fa-solid fa-box-archive"></i></div>
+                    <div class="metric-data">
+                        <span class="metric-value" id="stat-closed">0</span>
+                        <span class="metric-label">Closed</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Analytics Charts Row -->
+            <div class="grid-2col charts-row">
+                <!-- Chart 1: Complaints by Type -->
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-chart-pie"></i> Complaints by Category / Type</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="typeChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Complaints by Priority -->
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-chart-bar"></i> Complaints by Priority Level</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="priorityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart 3: Status Overview Row -->
+            <div class="card chart-card-full">
+                <div class="card-header">
+                    <h3><i class="fa-solid fa-chart-column"></i> Resolution Status Progression Breakdown</h3>
+                </div>
+                <div class="chart-container-horizontal">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= MODULE 4: SAAS & CLOUD COMPUTING MODULE (VIVA SPECIAL) ================= -->
+        <section id="module-cloud" class="module-section">
+            <div class="section-header">
+                <h2><i class="fa-solid fa-cloud-sun"></i> Cloud Computing Concepts & SaaS Architecture</h2>
+                <p>Explanation of cloud service models, SaaS demonstration features, and viva viva presentation guide.</p>
+            </div>
+
+            <!-- Cloud Architecture & Concept Cards Grid -->
+            <div class="grid-3col">
+                <div class="cloud-concept-card saas highlight">
+                    <div class="concept-badge">Current Architecture</div>
+                    <h3><i class="fa-solid fa-cloud"></i> SaaS (Software as a Service)</h3>
+                    <p><strong>Definition:</strong> Fully managed application hosted on cloud infrastructure and accessed by end users via web browser.</p>
+                    <ul class="concept-list">
+                        <li><i class="fa-solid fa-check-double"></i> <strong>User manages:</strong> Nothing! Only uses the web application.</li>
+                        <li><i class="fa-solid fa-check-double"></i> <strong>Cloud Provider manages:</strong> Application, data, runtime, OS, server hardware.</li>
+                        <li><i class="fa-solid fa-check-double"></i> <strong>Project Example:</strong> This Hostel Complaint System allows students and wardens to access the service directly without installing servers.</li>
+                    </ul>
+                </div>
+
+                <div class="cloud-concept-card paas">
+                    <h3><i class="fa-solid fa-cubes"></i> PaaS (Platform as a Service)</h3>
+                    <p><strong>Definition:</strong> Cloud platform providing runtimes, frameworks, and deployment engines for developers.</p>
+                    <ul class="concept-list">
+                        <li><i class="fa-solid fa-check"></i> <strong>User manages:</strong> Application code and data databases.</li>
+                        <li><i class="fa-solid fa-check"></i> <strong>Cloud Provider manages:</strong> OS, server runtime, scaling, network hardware.</li>
+                        <li><i class="fa-solid fa-check"></i> <strong>Examples:</strong> Google App Engine, Heroku, Firebase App Hosting.</li>
+                    </ul>
+                </div>
+
+                <div class="cloud-concept-card iaas">
+                    <h3><i class="fa-solid fa-server"></i> IaaS (Infrastructure as a Service)</h3>
+                    <p><strong>Definition:</strong> Virtualized computing resources (VMs, storage, firewalls) provided over the internet.</p>
+                    <ul class="concept-list">
+                        <li><i class="fa-solid fa-check"></i> <strong>User manages:</strong> OS, middleware, runtime, app code, data security.</li>
+                        <li><i class="fa-solid fa-check"></i> <strong>Cloud Provider manages:</strong> Physical servers, virtualizers, data centers.</li>
+                        <li><i class="fa-solid fa-check"></i> <strong>Examples:</strong> AWS EC2, Google Compute Engine (GCE), Azure VMs.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Comparison Table -->
+            <div class="card cloud-matrix-card">
+                <div class="card-header">
+                    <h3><i class="fa-solid fa-table-columns"></i> Cloud Service Model Comparison Matrix (SaaS vs PaaS vs IaaS)</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="matrix-table">
+                        <thead>
+                            <tr>
+                                <th>Feature / Layer</th>
+                                <th>IaaS (Infrastructure)</th>
+                                <th>PaaS (Platform)</th>
+                                <th class="active-col">SaaS (Software as a Service) - THIS APP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Target Audience</strong></td>
+                                <td>Network Architects, SysAdmins</td>
+                                <td>Software Developers</td>
+                                <td class="active-col">End Users (Students & Wardens)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Access Method</strong></td>
+                                <td>SSH, Cloud Console, API</td>
+                                <td>CLI, Git Push, SDK</td>
+                                <td class="active-col">Web Browser / Mobile App URL</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Data Storage</strong></td>
+                                <td>Raw Elastic Block / Object Storage</td>
+                                <td>Managed Cloud Database (Firestore/Postgres)</td>
+                                <td class="active-col">Integrated Cloud Application Database</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Maintenance Burden</strong></td>
+                                <td>High (OS updates, patches, firewall)</td>
+                                <td>Medium (App configuration, dependencies)</td>
+                                <td class="active-col">Zero for User (Fully automated cloud maintenance)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Live Cloud Sync Log Simulator -->
+            <div class="card cloud-logger-card">
+                <div class="card-header">
+                    <h3><i class="fa-solid fa-terminal"></i> Live Cloud Database Transaction Stream (Simulated SaaS Storage Log)</h3>
+                    <button class="btn btn-sm btn-secondary" onclick="clearLogs()"><i class="fa-solid fa-trash-can"></i> Clear Terminal</button>
+                </div>
+                <div id="cloud-log-stream" class="terminal-body">
+                    <!-- Logs generated dynamically -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Global Toast Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+        <div class="footer-container">
+            <p><strong>Cloud-Based Hostel Complaint Management System</strong> | SaaS Concept Viva Demonstration Project</p>
+            <p>Developed for Cloud Computing Course (CSA1516) | GitHub: <a href="https://github.com/saimohith-24/Cloud_CSA1516/tree/main/Assignment" target="_blank">Cloud_CSA1516/Assignment</a></p>
+        </div>
+    </footer>
+
+    <!-- App JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
